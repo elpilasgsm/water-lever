@@ -9,9 +9,7 @@ print(GPIO.VERSION)
 context = ssl.create_default_context()
 
 receivers = ["elpilasgsm@gmail.com",
-             "daria.zaruba@gmail.com",
-             "duzaporozhets@sfedu.ru",
-             "dvzaruba@sfedu.ru"]
+             "daria.zaruba@gmail.com"]
 
 sender = os.environ["SMTP_USERNAME"]
 password = os.environ["SMTP_PASSWORD"]
@@ -75,7 +73,7 @@ try:
     while True:
         onDetectorListen(FIRST_WATER_LEVEL_DETECTOR)
         onDetectorListen(SECOND_WATER_LEVEL_DETECTOR)
-        sleep(0.5)
+        sleep(60.0)
 except KeyboardInterrupt:
     GPIO.cleanup()
 
