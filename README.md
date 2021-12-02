@@ -5,6 +5,9 @@ The RaspberryPi 3 is used.
 It uses two GPIO outputs (17 and 27) by default to signalize water level in the tank.
 XKC-Y25-PNP is used.
 
+As an notification channel [Telegram Bot API](https://github.com/python-telegram-bot/python-telegram-bot) is used. 
+
+
 Yellow wire is connected to upper device output (2/3)
 Orange wire is connected to upper device output (2/3)
 Red wire is VCC
