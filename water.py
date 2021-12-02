@@ -1,41 +1,49 @@
-import smtplib, os
+import os
 import ssl
-from smtplib import SMTPException
 from time import sleep
 
 import RPi.GPIO as GPIO
+from telegram.bot import Bot, Update
 
 print(GPIO.VERSION)
 context = ssl.create_default_context()
+accessToken = os.environ["BOT_ACCESS_TOKEN"]
+bot = Bot(token=accessToken)
 
-receivers = ["elpilasgsm@gmail.com",
-             "daria.zaruba@gmail.com"]
+snowflake = u'\U00002744'
+decreasing = u'\U0001F621'
+increasing = u'\U0001F60A'
+yellowLevelDecr = u'\U0001F625'
+yellowLevelIncr = u'\U0001F60F'
+redLevelDecr = u'\U0001F631'
+redLevelIncr = u'\U0001F630'
 
-sender = os.environ["SMTP_USERNAME"]
-password = os.environ["SMTP_PASSWORD"]
-server = os.environ["SMTP_SERVER"]
-port = os.environ["SMTP_PORT"]
 
 def sendEmail(text):
-    try:
-        smtpObj = smtplib.SMTP(server, port)
-        smtpObj.ehlo()  # Can be omitted
-        smtpObj.starttls(context=context)  # Secure the connection
-        smtpObj.ehlo()  # Can be omitted
-        smtpObj.login(sender, password)
-        smtpObj.sendmail(sender, receivers, text)
-        print("Successfully sent email")
-    except SMTPException:
-        print("Can't Send Email")
+    # chatIds = set()
+    # updates = bot.get_updates()
+    # update: Update
+    # if updates:
+    #     for update in updates:
+    #         chatIds.add(update.effective_chat.id)
+    #
+    # print(chatIds)
+    # for chatId in chatIds:
+    bot.send_message(text=text, chat_id="-1001600345896", )
+
 
 FIRST_WATER_LEVEL_DETECTOR = {
-    "name": "Yellow: 2/3 of Water Tank",
+    "name": "2/3 of Water Tank",
     "pinId": 17,
+    "decreasingLabel": yellowLevelDecr,
+    "increasingLabel": yellowLevelIncr,
     "currentState": 0
 }
 SECOND_WATER_LEVEL_DETECTOR = {
-    "name": "Orange: 1/3 of Water Tank",
+    "name": "1/3 of Water Tank",
     "pinId": 27,
+    "decreasingLabel": redLevelDecr,
+    "increasingLabel": redLevelIncr,
     "currentState": 0
 }
 
@@ -50,21 +58,15 @@ def onDetectorListen(detector):
 
     if val != curVal:
         detector["currentState"] = val
-        text = ""
         if val == 0:
-            text = format("""\
-Subject: Home Water level DECREASING: %s
-
-The Lever is gone BELOW the detector Level: %s
+            text = format("""
+%s %s The Lever is BELOW the detector Level: %s
 Please decrease the usage of water.
-""" % (detector['name'], detector['name']))
+""" % (decreasing, detector["decreasingLabel"], detector['name']))
         else:
-            text = format("""\
-Subject: Home Water level INCREASING: %s
-
-The Lever is gone Above the detector Level: %s
-This is Good Sign.
-""" % (detector['name'], detector['name']))
+            text = format("""
+%s %s The Lever is ABOVE the detector Level: %s.
+""" % (increasing, detector["increasingLabel"], detector['name']))
         print(text)
         sendEmail(text)
 
